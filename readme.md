@@ -17,3 +17,5 @@ Comparing the 'airtime' given to male vs female backbenchers and figuring out wh
 Assessing which backbenchers are disproportionately talkative/the worst filibusterers.
 
 Using sentiment analysis to assess how the tone of Parliamentary discourse has changed over time.
+
+Tracking usage of key phrases over time, including: "apologise" "retract" and "sorry" as a measure of how naughty MPs have been; "immigration", "Europe", "war", "budget"

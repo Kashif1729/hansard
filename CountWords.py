@@ -43,4 +43,4 @@ def getNGrams(volName,n):
     print counter.most_common(500)
 
 getContributions("1909")
-getNGrams("1909",5)
+getNGrams("1909",1)
