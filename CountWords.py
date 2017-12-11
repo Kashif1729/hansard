@@ -26,12 +26,11 @@ def getContributions(volName):
     contributionsFile.close()
     print("all done!")
 
-# extract n-grams from member contributions
-def getNGrams(volName,n):
+# extract n-grams from member contributions and print the 'p' most frequently occurring phrases
+def getFreqs(volName,n,p):
 
     contributionsFile= codecs.open(volName+"_contributions.txt","r","utf-8")
     words = contributionsFile.read()
-    # words = nltk.word_tokenize(contributionsText)
     nGrams = ngrams(words.split(), n)
     phraseList = []
     for phrase in nGrams:
@@ -40,7 +39,7 @@ def getNGrams(volName,n):
 
     print "List constructed! Length: ", len(phraseList)
     counter=collections.Counter(phraseList)
-    print counter.most_common(500)
+    print counter.most_common(p)
 
 getContributions("1909")
-getNGrams("1909",1)
+getFreqs("1909",1,500)

@@ -18,4 +18,4 @@ Assessing which backbenchers are disproportionately talkative/the worst filibust
 
 Using sentiment analysis to assess how the tone of Parliamentary discourse has changed over time.
 
-Tracking usage of key phrases over time, including: "apologise" "retract" and "sorry" as a measure of how naughty MPs have been; "immigration", "Europe", "war", "budget"
+Tracking usage of key phrases over time, including: "apologise" "retract" and "sorry" as a measure of how naughty MPs have been; "immigration", "Europe", "war"; "budget"; "India", "colonies", "commonwealth", "empire", "China"; "communism"; "special relationship"; "internet"; "women" "suffrage" (have this as an interactive website; user can enter any word and visualise its usage over time?)
