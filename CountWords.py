@@ -5,7 +5,6 @@ import collections
 from nltk import ngrams
 import codecs
 
-
 # combine member contributions from a given volume into one txt file
 def getContributions(volName):
 
@@ -39,7 +38,9 @@ def getFreqs(volName,n,p):
 
     print "List constructed! Length: ", len(phraseList)
     counter=collections.Counter(phraseList)
-    print counter.most_common(p)
+    return counter.most_common(p)
+
 
 getContributions("1909")
-getFreqs("1909",1,500)
+mostCommon = getFreqs("1909",1,500)
+print mostCommon
