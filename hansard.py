@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 def getOldContribs(searchTerm):
 
     contributionDates = []
-    uniqueCounts = []
 
     # search archive dating from 1803-2005
 
@@ -18,68 +17,75 @@ def getOldContribs(searchTerm):
     initPage = urllib2.urlopen(initURL).read()
     initSoup = BeautifulSoup(initPage,'lxml')
 
-    totalPages = int(math.ceil(int(initSoup.find("h3", {"id": "results-header"}).getText().replace(',','').split()[-1])/10))
+    if initSoup.find("p", {"class": "pagination-total"}):
 
-    for i in range(1,totalPages+1):
+        totalPages = int(math.ceil(int(initSoup.find("h3", {"id": "results-header"}).getText().replace(',','').split()[-1])/10))
 
-        print "Parsing archived page ", i, " of ", totalPages
+        for i in range(1,totalPages+1):
 
-        searchURL = "http://hansard.millbanksystems.com/search/"+searchTerm+"?page="+str(i)+"sort=date&type=Commons"
-        searchPage = urllib2.urlopen(searchURL).read()
-        searchSoup = BeautifulSoup(searchPage,'lxml')
-        resultHeadings = searchSoup.find_all("div", {"class": "date"})
+            print "Parsing archived page ", i, " of ", totalPages
 
-        for result in resultHeadings:
-            contribDate = result.getText().replace(',','').encode('utf-8').split()[2:5]
-            contribDate[0] = str(datetime.strptime(contribDate[0], '%B').month)
-            contribDateFormat = datetime.strptime(" ".join(contribDate), '%m %d %Y')
-            contributionDates.append(contribDateFormat)
+            searchURL = "http://hansard.millbanksystems.com/search/"+searchTerm+"?page="+str(i)+"sort=date&type=Commons"
+            searchPage = urllib2.urlopen(searchURL).read()
+            searchSoup = BeautifulSoup(searchPage,'lxml')
+            resultHeadings = searchSoup.find_all("div", {"class": "date"})
 
-    uniqueDates = sorted(set(contributionDates))
+            for result in resultHeadings:
+                contribDate = result.getText().replace(',','').encode('utf-8').split()[2:5]
+                contribDate[0] = str(datetime.strptime(contribDate[0], '%B').month)
+                contribDateFormat = datetime.strptime(" ".join(contribDate), '%m %d %Y')
+                contributionDates.append(contribDateFormat)
 
-    for date in uniqueDates:
-        uniqueCounts.append(contributionDates.count(date))
+    return contributionDates
 
-    return uniqueDates, uniqueCounts
-
-def getNewContribs(searchTerm,contributionDates,contributionCounts):
+def getNewContribs(searchTerm,contributionDates):
 
     # search new records from 2006-present day
 
-    searchTerm = "India"
-
     pageNum=1
-    contributionDates = []
-    
+
     initURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
     initPage = urllib2.urlopen(initURL).read()
     initSoup = BeautifulSoup(initPage,'lxml')
 
-    totalPages = int(initSoup.find("p", {"class": "pagination-total"}).getText().replace(',','').replace('(','').replace(')','').split()[-1])
-    print totalPages
+    if initSoup.find("p", {"class": "pagination-total"}):
 
-    for i in range(1,totalPages+1):
+        totalPages = int(initSoup.find("p", {"class": "pagination-total"}).getText().replace(',','').replace('(','').replace(')','').split()[-1])
 
-        print "Parsing new page ", i, " of ", totalPages
+        for i in range(1,totalPages+1):
 
-        searchURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
-        searchPage = urllib2.urlopen(searchURL).read()
-        searchSoup = BeautifulSoup(searchPage,'lxml')
-        resultHeadings = searchSoup.find_all("div", {"class": "information with-portcullis clearfix"})
+            print "Parsing new page ", i, " of ", totalPages
 
-        for result in resultHeadings:
-            print "NEW RESULT"
-            contribDate = result.find_all("div")[1].getText().encode('utf-8').split()
-            contribDate[1] = str(datetime.strptime(contribDate[1], '%B').month)
-            contribDateFormat = datetime.strptime(" ".join(contribDate), '%d %m %Y')
-            contributionDates.append(contribDateFormat)
+            searchURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
+            searchPage = urllib2.urlopen(searchURL).read()
+            searchSoup = BeautifulSoup(searchPage,'lxml')
+            resultHeadings = searchSoup.find_all("div", {"class": "information with-portcullis clearfix"})
 
-def plotContribs(searchTerm,uniqueDates,uniqueCounts):
+            for result in resultHeadings:
+                contribDate = result.find_all("div")[1].getText().encode('utf-8').split()
+                contribDate[1] = str(datetime.strptime(contribDate[1], '%B').month)
+                contribDateFormat = datetime.strptime(" ".join(contribDate), '%d %m %Y')
+                contributionDates.append(contribDateFormat)
+
+    return contributionDates
+
+def plotContribs(searchTerm,contributionDates):
+
+    len(contributionDates)
+    uniqueDates = sorted(set(contributionDates))
+    uniqueCounts = []
+
+    for date in uniqueDates:
+        uniqueCounts.append(contributionDates.count(date))
 
     matplotlib.rcParams['toolbar'] = 'None' # switch off toolbar
-    plt.plot(uniqueDates,uniqueCounts)
+    plt.bar(uniqueDates,uniqueCounts)
     plt.gcf().autofmt_xdate()
     plt.show()
 
-# [dates, contributions] = getOldContribs("internet")
+    return uniqueDates, uniqueCounts
 
+searchTerm = "meme"
+contributionDates = getOldContribs(searchTerm)
+contributionDates = getNewContribs(searchTerm,contributionDates)
+[uniqueDates, uniqueCounts] = plotContribs(searchTerm,contributionDates)
