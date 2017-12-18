@@ -4,10 +4,13 @@ from bs4 import BeautifulSoup
 import math
 from datetime import datetime
 import collections
+import matplotlib
+import matplotlib.pyplot as plt
 
 def getContribs(searchTerm):
 
-    contributions = []
+    dates = []
+
 
     pageNum=1
     initURL = "http://hansard.millbanksystems.com/search/"+searchTerm+"?page="+str(pageNum)+"sort=date&type=Commons"
@@ -27,12 +30,24 @@ def getContribs(searchTerm):
 
         for result in resultHeadings:
             contribDate = result.getText().replace(',','').encode('utf-8').split()[2:5]
-            contribDateFormat = datetime.strptime(" ".join(contribDate), '%B %d %Y')
-            contributions.append(contribDateFormat)
+            contribDate[0] = str(datetime.strptime(contribDate[0], '%B').month)
+            contribDateFormat = datetime.strptime(" ".join(contribDate), '%m %d %Y')
+            dates.append(contribDateFormat)
 
-    return contributions
+    return dates
 
 contributions = getContribs("Twitter")
-ctr = collections.Counter(contributions)
+uniqueDates = sorted(set(contributions))
+counts = []
 
-print ctr
+for date in uniqueDates:
+    counts.append(contributions.count(date))
+
+print uniqueDates
+print counts
+print len(counts)
+print len(uniqueDates)
+
+plt.plot(uniqueDates,counts)
+plt.gcf().autofmt_xdate()
+plt.show()
