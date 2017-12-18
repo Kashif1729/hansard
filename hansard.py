@@ -17,7 +17,7 @@ def getOldContribs(searchTerm):
     initPage = urllib2.urlopen(initURL).read()
     initSoup = BeautifulSoup(initPage,'lxml')
 
-    if initSoup.find("p", {"class": "pagination-total"}):
+    if initSoup.find("h3", {"id": "results-header"}):
 
         totalPages = int(math.ceil(int(initSoup.find("h3", {"id": "results-header"}).getText().replace(',','').split()[-1])/10))
 
@@ -44,7 +44,7 @@ def getNewContribs(searchTerm,contributionDates):
 
     pageNum=1
 
-    initURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
+    initURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)+"&house=Commons"
     initPage = urllib2.urlopen(initURL).read()
     initSoup = BeautifulSoup(initPage,'lxml')
 
@@ -56,7 +56,7 @@ def getNewContribs(searchTerm,contributionDates):
 
             print "Parsing new page ", i, " of ", totalPages
 
-            searchURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
+            searchURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(i)+"&house=Commons"
             searchPage = urllib2.urlopen(searchURL).read()
             searchSoup = BeautifulSoup(searchPage,'lxml')
             resultHeadings = searchSoup.find_all("div", {"class": "information with-portcullis clearfix"})
@@ -71,21 +71,23 @@ def getNewContribs(searchTerm,contributionDates):
 
 def plotContribs(searchTerm,contributionDates):
 
-    len(contributionDates)
     uniqueDates = sorted(set(contributionDates))
     uniqueCounts = []
+
+    print (contributionDates)
 
     for date in uniqueDates:
         uniqueCounts.append(contributionDates.count(date))
 
     matplotlib.rcParams['toolbar'] = 'None' # switch off toolbar
-    plt.bar(uniqueDates,uniqueCounts)
+    bars = plt.bar(uniqueDates,uniqueCounts,color='red')
     plt.gcf().autofmt_xdate()
     plt.show()
 
     return uniqueDates, uniqueCounts
 
-searchTerm = "meme"
+searchTerm = "corruption"
 contributionDates = getOldContribs(searchTerm)
 contributionDates = getNewContribs(searchTerm,contributionDates)
 [uniqueDates, uniqueCounts] = plotContribs(searchTerm,contributionDates)
+
