@@ -46,13 +46,33 @@ def getNewContribs(searchTerm,contributionDates,contributionCounts):
 
     # search new records from 2006-present day
 
+    searchTerm = "India"
+
     pageNum=1
+    contributionDates = []
+    
     initURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
     initPage = urllib2.urlopen(initURL).read()
     initSoup = BeautifulSoup(initPage,'lxml')
 
     totalPages = int(initSoup.find("p", {"class": "pagination-total"}).getText().replace(',','').replace('(','').replace(')','').split()[-1])
     print totalPages
+
+    for i in range(1,totalPages+1):
+
+        print "Parsing new page ", i, " of ", totalPages
+
+        searchURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
+        searchPage = urllib2.urlopen(searchURL).read()
+        searchSoup = BeautifulSoup(searchPage,'lxml')
+        resultHeadings = searchSoup.find_all("div", {"class": "information with-portcullis clearfix"})
+
+        for result in resultHeadings:
+            print "NEW RESULT"
+            contribDate = result.find_all("div")[1].getText().encode('utf-8').split()
+            contribDate[1] = str(datetime.strptime(contribDate[1], '%B').month)
+            contribDateFormat = datetime.strptime(" ".join(contribDate), '%d %m %Y')
+            contributionDates.append(contribDateFormat)
 
 def plotContribs(searchTerm,uniqueDates,uniqueCounts):
 
@@ -63,31 +83,3 @@ def plotContribs(searchTerm,uniqueDates,uniqueCounts):
 
 # [dates, contributions] = getOldContribs("internet")
 
-# search new records from 2006-present day
-
-searchTerm = "India"
-
-pageNum=1
-contributionDates = []
-
-initURL = "http://hansard.parliament.uk/search/Contributions?searchTerm="+searchTerm+"&page="+str(pageNum)
-initPage = urllib2.urlopen(initURL).read()
-initSoup = BeautifulSoup(initPage,'lxml')
-
-totalPages = int(initSoup.find("p", {"class": "pagination-total"}).getText().replace(',','').replace('(','').replace(')','').split()[-1])
-print totalPages
-
-for i in range(1,totalPages+1):
-
-    print "Parsing archived page ", i, " of ", totalPages
-
-    searchURL = "http://hansard.millbanksystems.com/search/"+searchTerm+"?page="+str(i)+"sort=date&type=Commons"
-    searchPage = urllib2.urlopen(searchURL).read()
-    searchSoup = BeautifulSoup(searchPage,'lxml')
-    resultHeadings = searchSoup.find_all("div", {"class": "date"})
-
-    for result in resultHeadings:
-        contribDate = result.getText().replace(',','').encode('utf-8').split()[2:5]
-        contribDate[0] = str(datetime.strptime(contribDate[0], '%B').month)
-        contribDateFormat = datetime.strptime(" ".join(contribDate), '%m %d %Y')
-        contributionDates.append(contribDateFormat)
