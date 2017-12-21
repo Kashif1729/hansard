@@ -62,25 +62,27 @@ def getMidContribs(searchTerm): # this is super gross
                         dateShort = year[3:4]+month+day
                     else:
                         dateShort = date
-                    # print "Trying session: ",session, " Date: ", date
-                    contentsURL1 = "https://publications.parliament.uk/pa/cm"+session+"/cmhansrd/cm"+date+"/debindx/"+dateShort+"-x.htm"
-                    contentsURL2 = "https://publications.parliament.uk/pa/cm"+session+"/cmhansrd/vo"+date+"/debindx/"+dateShort+"-x.htm"
 
-                    contentsPage1 = urllib2.urlopen(contentsURL1).read()
+                    # print "Trying session: ",session, " Date: ", date
+                    # contentsURL1 = "https://publications.parliament.uk/pa/cm"+session+"/cmhansrd/cm"+date+"/debindx/"+dateShort+"-x.htm"
+                    contentsURL2 = "https://publications.parliament.uk/pa/cm"+session+"/cmhansrd/vo"+date+"/debtext/"+dateShort+"-01.htm"
+
+                    # contentsPage1 = urllib2.urlopen(contentsURL1).read()
                     contentsPage2 = urllib2.urlopen(contentsURL2).read()
 
-                    contentsSoup1 = BeautifulSoup(contentsPage1,'lxml')
+                    # contentsSoup1 = BeautifulSoup(contentsPage1,'lxml')
                     contentsSoup2 = BeautifulSoup(contentsPage2,'lxml')
 
-                    if contentsSoup1.find("h1"):
+                    if contentsSoup2.find("h1") is None:
+                        print contentsURL2
 
-                    response1 = contentsSoup1.find("h1").getText().strip()
-                    response2 = contentsSoup2.find("h1").getText().strip()
+                    # response1 = contentsSoup1.find("h1").getText().strip()
+                    # response2 = contentsSoup2.find("h1").getText().strip()
 
-                    if response1 != "Page cannot be found":
-                        print "Correct CM URL: ",contentsURL1
-                    elif response2 != "Page cannot be found":
-                        print "Correct VO URL: ",contentsURL2
+                    # if response1 != "Page cannot be found":
+                    #     print "Correct CM URL: ",contentsURL1
+                    # elif response2 != "Page cannot be found":
+                    #     print "Correct VO URL: ",contentsURL2
 
                     # if contentsSoup.find("h1").getText().strip() != "Page cannot be found":
                     #     print "Page exists"
