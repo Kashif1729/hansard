@@ -10,18 +10,16 @@ import re
 import os
 import time
 from glob import glob
+import calendar
 
-def saveMidContribs(searchTerm): # this is super gross
+# function to save daily Hansard records from 2005-2010 locally as HTML files
+def saveMidContribs():
 
-    contributionDates = []
-
-    # search archive from 2005-2010
+    # download archive from 2005-2010
 
     days = ['01', '02', '03', '04', '05', '06', '07' ,'08' ,'09', '10', '11' ,'12', '13', '14' ,'15',
             '16', '17' ,'18' ,'19' ,'20' ,'21' ,'22' ,'23', '24' ,'25' ,'26' ,'27', '28' ,'29', '30' ,'31']
     # months = ['01', '02' ,'03', '04', '05' ,'06', '07', '08', '09', '10', '11', '12']
-    # years = ['2005', '2006', '2007', '2008', '2009', '2010']
-    # sessions = ['200405', '200506' ,'200607', '200708', '200809' ,'200910']
 
     validSessions = ['200405 2004 11','200405 2004 12', '200405 2005 01', '200405 2005 02','200405 2005 03','200405 2005 04',
                      '200506 2005 05','200506 2005 06','200506 2005 07','200506 2005 08','200506 2005 09','200506 2005 10',
@@ -98,7 +96,33 @@ def saveMidContribs(searchTerm): # this is super gross
             except:
                 print "not a valid date!"
 
-    return contributionDates
+# function to save daily Hansard records from 1803-2004 locally as HTML files
+def saveOldContribs():
+
+    for year in range(1924,2005): #2005):
+        for month in range(1,13):
+            for day in range(8,32):
+
+                monthName = calendar.month_name[month].lower()[0:3]
+                contentsURL = "http://hansard.millbanksystems.com/sittings/"+str(year)+"/"+monthName+"/"+str(day).zfill(2)
+
+                try:
+                    print "trying date: ", str(year)+' '+str(month)+' '+str(day).zfill(2)
+                    contentsPage = urllib2.urlopen(contentsURL).read()
+                    contentsSoup = BeautifulSoup(contentsPage,'lxml')
+                    print "success!"
+                    saveFile = open('./XXXX'+ ' '+str(year)+' '+str(month)+' '+str(day).zfill(2)+'.html', 'w')
+                    commonsSection = contentsSoup.find_all("ol", {"class": "xoxo first"})[0]
+                    for link in commonsSection.find_all('a', href=True):
+                        linkURL = "http://hansard.millbanksystems.com"+link['href']
+                        print linkURL
+                        linkPage = urllib2.urlopen(linkURL).read()
+                        saveFile.write(linkPage)
+
+                    saveFile.close()
+                except:
+                    print "page not found!"
+
 
 def getOldContribs(searchTerm):
 
@@ -208,7 +232,8 @@ def plotContribs(searchTerm,contributionDates):
     return uniqueDates, uniqueCounts
 
 searchTerm = "internet"
-saveMidContribs(searchTerm)
+#saveMidContribs()
+saveOldContribs()
 # contributionDatesOld = getOldContribs(searchTerm)
 # contributionDatesMid = getMidContribs(searchTerm,contributionDatesOld)
 # contributionDatesNew = getNewContribs(searchTerm,contributionDatesMid)
