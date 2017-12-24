@@ -1,10 +1,8 @@
 # import libraries
 import urllib2
-import requests
 from bs4 import BeautifulSoup
 import math
 from datetime import datetime
-import matplotlib
 import matplotlib.pyplot as plt
 import re
 import os
@@ -15,11 +13,8 @@ import calendar
 # function to save daily Hansard records from 2005-2010 locally as HTML files
 def saveMidContribs():
 
-    # download archive from 2005-2010
-
     days = ['01', '02', '03', '04', '05', '06', '07' ,'08' ,'09', '10', '11' ,'12', '13', '14' ,'15',
             '16', '17' ,'18' ,'19' ,'20' ,'21' ,'22' ,'23', '24' ,'25' ,'26' ,'27', '28' ,'29', '30' ,'31']
-    # months = ['01', '02' ,'03', '04', '05' ,'06', '07', '08', '09', '10', '11', '12']
 
     validSessions = ['200405 2004 11','200405 2004 12', '200405 2005 01', '200405 2005 02','200405 2005 03','200405 2005 04',
                      '200506 2005 05','200506 2005 06','200506 2005 07','200506 2005 08','200506 2005 09','200506 2005 10',
@@ -101,7 +96,7 @@ def saveOldContribs():
 
     for year in range(1924,2005): #2005):
         for month in range(1,13):
-            for day in range(8,32):
+            for day in range(1,32):
 
                 monthName = calendar.month_name[month].lower()[0:3]
                 contentsURL = "http://hansard.millbanksystems.com/sittings/"+str(year)+"/"+monthName+"/"+str(day).zfill(2)
@@ -123,6 +118,24 @@ def saveOldContribs():
                 except:
                     print "page not found!"
 
+def saveNewContribs():
+
+    for year in range(2011,2018):
+        for month in range(1,13):
+            for day in range(1,32):
+
+                contentsURL = "http://hansard.parliament.uk/commons/"+str(year)+"-"+str(month).zfill(2)+"-"+str(day).zfill(2)
+
+                try:
+                    print "trying date: ", str(year)+' '+str(month)+' '+str(day).zfill(2)
+                    contentsPage = urllib2.urlopen(contentsURL).read()
+                    contentsSoup = BeautifulSoup(contentsPage,'lxml')
+                    commonsSection = contentsSoup.find_all("li", {"class": "no children"})
+                    for listItem in commonsSection:
+                        listItem.find('a', href=True)
+                    print "success!"
+                except:
+                    print "page not found!"
 
 def getOldContribs(searchTerm):
 
