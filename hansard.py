@@ -126,16 +126,22 @@ def saveNewContribs():
 
                 contentsURL = "http://hansard.parliament.uk/commons/"+str(year)+"-"+str(month).zfill(2)+"-"+str(day).zfill(2)
 
-                try:
-                    print "trying date: ", str(year)+' '+str(month)+' '+str(day).zfill(2)
-                    contentsPage = urllib2.urlopen(contentsURL).read()
-                    contentsSoup = BeautifulSoup(contentsPage,'lxml')
-                    commonsSection = contentsSoup.find_all("li", {"class": "no children"})
-                    for listItem in commonsSection:
-                        listItem.find('a', href=True)
+                print "trying date: ", str(year)+' '+str(month)+' '+str(day).zfill(2)
+                print contentsURL
+                contentsPage = urllib2.urlopen(contentsURL).read()
+                contentsSoup = BeautifulSoup(contentsPage,'lxml')
+                commonsSection = contentsSoup.find_all("li", {"class": "no-children"})
+                if commonsSection:
                     print "success!"
-                except:
-                    print "page not found!"
+                    saveFile = open('./XXXX'+ ' '+str(year)+' '+str(month)+' '+str(day).zfill(2)+'.html', 'w')
+                    for listItem in commonsSection:
+                        linkURL = "http://hansard.parliament.uk"+listItem.find('a', href=True)['href']
+                        print linkURL
+                        linkPage = urllib2.urlopen(linkURL).read()
+                        linkSoup = BeautifulSoup(linkPage,'lxml')
+                        saveFile.write(linkPage)
+                else:
+                    print "no sittings"
 
 def getOldContribs(searchTerm):
 
@@ -246,7 +252,8 @@ def plotContribs(searchTerm,contributionDates):
 
 searchTerm = "internet"
 #saveMidContribs()
-saveOldContribs()
+#saveOldContribs()
+saveNewContribs()
 # contributionDatesOld = getOldContribs(searchTerm)
 # contributionDatesMid = getMidContribs(searchTerm,contributionDatesOld)
 # contributionDatesNew = getNewContribs(searchTerm,contributionDatesMid)
