@@ -232,6 +232,42 @@ def getNewContribs(searchTerm,contributionDates):
 
     return contributionDates
 
+def searchContribs(searchTerm,startDate,endDate):
+
+    contributionDates = []
+    contributionCounts = []
+    uniqueDates = []
+    uniqueCounts = []
+
+    for htmlFilePath in glob("./Archive/*.html"):
+
+        year = htmlFilePath.split("/")[2].split(" ")[1]
+        month = htmlFilePath.split("/")[2].split(" ")[2].zfill(2)
+        day = htmlFilePath.split("/")[2].split(" ")[3][0:2]
+
+        contribDate = datetime.strptime(" ".join([day, month, year]), '%d %m %Y')
+        start = datetime.strptime(startDate, '%d %m %Y')
+        end = datetime.strptime(endDate, '%d %m %Y')
+
+        if contribDate >= start and contribDate <= end:
+            print "opening: ", htmlFilePath
+            htmlFile = open(htmlFilePath,'r')
+            fileSoup = BeautifulSoup(htmlFile.read(),'html.parser')
+            searchResults = fileSoup.find_all(string=re.compile('.*{0}.*'.format(searchTerm)),recursive=True)
+            print searchResults
+            if len(searchResults) > 0:
+                for result in searchResults:
+                    contributionDates.append(contribDate)
+
+            htmlFile.close()
+
+    uniqueDates = sorted(set(contributionDates))
+
+    for date in uniqueDates:
+        uniqueCounts.append(contributionDates.count(date))
+
+    return uniqueDates, uniqueCounts
+
 def plotContribs(searchTerm,contributionDates):
 
     uniqueDates = sorted(set(contributionDates))
@@ -250,10 +286,14 @@ def plotContribs(searchTerm,contributionDates):
 
     return uniqueDates, uniqueCounts
 
-searchTerm = "internet"
+searchTerm = "Europe"
+startDate = '10 01 2011'
+endDate = '12 01 2011'
+dates, counts = searchContribs(searchTerm,startDate,endDate)
+print dates, counts
 #saveMidContribs()
 #saveOldContribs()
-saveNewContribs()
+#saveNewContribs()
 # contributionDatesOld = getOldContribs(searchTerm)
 # contributionDatesMid = getMidContribs(searchTerm,contributionDatesOld)
 # contributionDatesNew = getNewContribs(searchTerm,contributionDatesMid)
